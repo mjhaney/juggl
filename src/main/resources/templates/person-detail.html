@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${person.name}">Person Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 24px;
+            line-height: 1.6;
+        }
+        header nav ul {
+            display: flex;
+            gap: 16px;
+            list-style: none;
+            padding: 0;
+            margin: 0 0 24px 0;
+        }
+        header nav a {
+            text-decoration: none;
+            color: #1a73e8;
+        }
+        h1 {
+            margin-bottom: 12px;
+        }
+        .panel {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            background: #fafafa;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background: #f4f6fb;
+        }
+        button, input[type="text"], select {
+            font: inherit;
+        }
+        button {
+            padding: 8px 14px;
+            border: 1px solid #1a73e8;
+            background: #1a73e8;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        button.secondary {
+            border-color: #888;
+            background: #fff;
+            color: #333;
+        }
+        button.danger {
+            border-color: #d23f31;
+            background: #d23f31;
+        }
+        button.small {
+            padding: 4px 8px;
+            font-size: 0.9em;
+        }
+        .field {
+            display: grid;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .field label {
+            display: block;
+            font-weight: 600;
+        }
+        .field input, .field select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+        .inline-form {
+            display: flex;
+            gap: 8px;
+            align-items: end;
+        }
+        .inline-form .field {
+            margin-bottom: 0;
+            flex: 1;
+        }
+        .expertise-badge {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+        .expertise-beginner { background: #e3f2fd; color: #1976d2; }
+        .expertise-intermediate { background: #fff3e0; color: #f57c00; }
+        .expertise-advanced { background: #f3e5f5; color: #7b1fa2; }
+        .expertise-expert { background: #e8f5e8; color: #388e3c; }
+    </style>
+</head>
+<body>
+<header>
+    <nav>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/persons">Persons</a></li>
+            <li><a href="/skills">Skills</a></li>
+        </ul>
+    </nav>
+</header>
+<main>
+    <h1 th:text="${person.name}">Person Details</h1>
+
+    <!-- Person Info Panel -->
+    <div class="panel">
+        <h2>Person Information</h2>
+        <form th:object="${person}" th:action="@{/persons}" method="post">
+            <input type="hidden" th:field="*{id}" />
+            <div class="field">
+                <label for="name">Name</label>
+                <input id="name" type="text" th:field="*{name}" required />
+            </div>
+            <div>
+                <button type="submit">Save Changes</button>
+                <a href="/persons"><button type="button" class="secondary">Back to List</button></a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Skills Panel -->
+    <div class="panel">
+        <h2>Skills</h2>
+
+        <!-- Current Skills -->
+        <div th:if="${person.skills.empty}">
+            <p>No skills assigned yet.</p>
+        </div>
+        <table th:if="${!person.skills.empty}">
+            <thead>
+                <tr>
+                    <th>Skill</th>
+                    <th>Expertise Level</th>
+                    <th style="width:200px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="personSkill : ${person.skills}">
+                    <td th:text="${personSkill.skill.name}"></td>
+                    <td>
+                        <span th:class="'expertise-badge expertise-' + ${#strings.toLowerCase(personSkill.level)}"
+                              th:text="${personSkill.level}"></span>
+                    </td>
+                    <td>
+                        <!-- Update level form -->
+                        <form th:action="@{/persons/{personId}/skills/{skillId}/update(personId=${person.id}, skillId=${personSkill.skill.id})}"
+                              method="post" style="display: inline;">
+                            <select name="level" onchange="this.form.submit()">
+                                <option th:each="level : ${expertiseLevels}"
+                                        th:value="${level}"
+                                        th:text="${level}"
+                                        th:selected="${level} == ${personSkill.level}"></option>
+                            </select>
+                        </form>
+                        <!-- Remove skill -->
+                        <form th:action="@{/persons/{personId}/skills/{skillId}/delete(personId=${person.id}, skillId=${personSkill.skill.id})}"
+                              method="post" style="display: inline;">
+                            <button type="submit" class="danger small" onclick="return confirm('Remove this skill?')">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Add New Skill -->
+        <h3>Add Skill</h3>
+        <form th:action="@{/persons/{id}/skills(id=${person.id})}" method="post" class="inline-form">
+            <div class="field">
+                <label for="skillId">Skill</label>
+                <select id="skillId" name="skillId" required>
+                    <option value="">Select a skill...</option>
+                    <option th:each="skill : ${allSkills}"
+                            th:value="${skill.id}"
+                            th:text="${skill.name}"
+                            thxx:disabled="${person.skills.stream().map(ps -> ps.skill.id).contains(skill.id)}"></option>
+                </select>
+            </div>
+            <div class="field">
+                <label for="level">Expertise Level</label>
+                <select id="level" name="level" required>
+                    <option th:each="level : ${expertiseLevels}" th:value="${level}" th:text="${level}"></option>
+                </select>
+            </div>
+            <div class="field">
+                <button type="submit">Add Skill</button>
+            </div>
+        </form>
+    </div>
+</main>
+</body>
+</html>

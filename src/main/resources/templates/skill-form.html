@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${skill.id} == null ? 'Create Skill' : 'Edit Skill'">Skill Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 24px;
+            line-height: 1.6;
+        }
+        header nav ul {
+            display: flex;
+            gap: 16px;
+            list-style: none;
+            padding: 0;
+            margin: 0 0 24px 0;
+        }
+        header nav a {
+            text-decoration: none;
+            color: #1a73e8;
+        }
+        h1 {
+            margin-bottom: 12px;
+        }
+        .panel {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            background: #fafafa;
+        }
+        button, input[type="text"] {
+            font: inherit;
+        }
+        button {
+            padding: 8px 14px;
+            border: 1px solid #1a73e8;
+            background: #1a73e8;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        button.secondary {
+            border-color: #888;
+            background: #fff;
+            color: #333;
+        }
+        .field {
+            display: grid;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .field label {
+            display: block;
+            font-weight: 600;
+        }
+        .field input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <nav>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/skills">Skills</a></li>
+        </ul>
+    </nav>
+</header>
+<main>
+    <h1 th:text="${skill.id} == null ? 'Create Skill' : 'Edit Skill'">Skill Form</h1>
+
+    <div class="panel">
+        <form th:object="${skill}" th:action="@{/skills}" method="post">
+            <input type="hidden" th:field="*{id}" />
+            <div class="field">
+                <label for="name">Skill name</label>
+                <input id="name" type="text" th:field="*{name}" required autofocus />
+            </div>
+            <div>
+                <button type="submit" th:text="${skill.id} == null ? 'Create' : 'Save'">Save</button>
+                <a href="/skills"><button type="button" class="secondary">Cancel</button></a>
+            </div>
+        </form>
+    </div>
+</main>
+</body>
+</html>

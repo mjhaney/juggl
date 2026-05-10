@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skills</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 24px;
+            line-height: 1.6;
+        }
+        header nav ul {
+            display: flex;
+            gap: 16px;
+            list-style: none;
+            padding: 0;
+            margin: 0 0 24px 0;
+        }
+        header nav a {
+            text-decoration: none;
+            color: #1a73e8;
+        }
+        h1 {
+            margin-bottom: 12px;
+        }
+        .panel {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            background: #fafafa;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background: #f4f6fb;
+        }
+        button, input[type="text"] {
+            font: inherit;
+        }
+        button {
+            padding: 8px 14px;
+            border: 1px solid #1a73e8;
+            background: #1a73e8;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        button.secondary {
+            border-color: #888;
+            background: #fff;
+            color: #333;
+        }
+        button.danger {
+            border-color: #d23f31;
+            background: #d23f31;
+        }
+        .field {
+            display: grid;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .field label {
+            display: block;
+            font-weight: 600;
+        }
+        .field input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+        .toolbar {
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body>
+<header>
+    <nav>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/skills">Skills</a></li>
+        </ul>
+    </nav>
+</header>
+<main>
+    <h1>Skills</h1>
+    <div class="toolbar">
+        <a href="/skills/new"><button>New skill</button></a>
+    </div>
+
+    <div class="panel">
+        <h2>Available skills</h2>
+        <div th:if="${skills.empty}">No skills defined yet.</div>
+        <table th:if="${!skills.empty}">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th style="width:220px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="skill : ${skills}">
+                    <td th:text="${skill.name}"></td>
+                    <td>
+                        <a th:href="@{/skills/{id}/edit(id=${skill.id})}"><button type="button" class="secondary">Edit</button></a>
+                        <form th:action="@{/skills/{id}/delete(id=${skill.id})}" method="post" style="display: inline;">
+                            <button type="submit" class="danger" onclick="return confirm('Delete this skill?')">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</main>
+</body>
+</html>
